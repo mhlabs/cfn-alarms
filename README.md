@@ -7,6 +7,9 @@ _*CDK support is pending the outstanding issues in [cdk-dasm](https://github.com
 ## Why?
 This is an effort to create a baseline of CloudFormation alarms for CloudFormation stacks. The intention is to save developers' time by providing a fast way to create alarms that follow some good practices so they can focus on building features rather than managing monitors.
 
+## Demo
+![demo](./images/demo.gif)
+
 ## Usage:
 
 ### 1. Point the tool at your CloudFormation or SAM template. If you use CDK, point it at the synthesized template of which you want to create alarms.
