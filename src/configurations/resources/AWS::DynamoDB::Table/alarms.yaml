@@ -1,0 +1,40 @@
+DynamoDBErrorsAlarm:
+  Metadata:
+    AlarmConfig:
+      Type: SimpleSum
+      NameSuffix: TotalErrors
+      Path: $.Properties.Metrics
+      MetricTemplate:
+        - Id: usererrors
+          MetricStat:
+            Metric:
+              Dimensions:
+                - Name: TableName
+                  Value: !Ref ResourceNameIterator
+              MetricName: UserErrors
+              Namespace: AWS/DynamoDB
+            Period: 300
+            Stat: Sum
+          ReturnData: false
+        - Id: systemerrors
+          MetricStat:
+            Metric:
+              Dimensions:
+                - Name: TableName
+                  Value: !Ref ResourceNameIterator
+              MetricName: SystemErrors
+              Namespace: AWS/DynamoDB
+            Period: 300
+            Stat: Sum
+          ReturnData: false
+        - Id: s1
+          Expression: systemerrors+usererrors
+  Type: AWS::CloudWatch::Alarm
+  Properties:
+    AlarmDescription: !Sub DynamoDB Errors > 0 for ResourceNameIterator
+    ComparisonOperator: GreaterThanThreshold
+    DatapointsToAlarm: 1
+    EvaluationPeriods: 6
+    Metrics: []
+    Threshold: 0
+    TreatMissingData: notBreaching

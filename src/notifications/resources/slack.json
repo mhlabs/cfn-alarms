@@ -1,0 +1,148 @@
+{
+  "AlarmSlackConnection": {
+    "Type": "AWS::Events::Connection",
+    "Properties": {
+      "AuthorizationType": "API_KEY",
+      "AuthParameters": {
+        "ApiKeyAuthParameters": {
+          "ApiKeyName": "Authorization",
+          "ApiKeyValue": {
+            "Fn::Join": [
+              " ",
+              [
+                "Bearer",
+                "{{resolve:secretsmanager:env-slack/Token:SecretString:Value}}"
+              ]
+            ]
+          }
+        }
+      }
+    }
+  },
+  "AlarmApiDestination": {
+    "Type": "AWS::Events::ApiDestination",
+    "Properties": {
+      "ConnectionArn": { "Fn::GetAtt": ["AlarmSlackConnection", "Arn"] },
+      "InvocationEndpoint": "https://slack.com/api/chat.postMessage",
+      "HttpMethod": "POST",
+      "InvocationRateLimitPerSecond": 10
+    }
+  },
+  "AlarmEventBridgeTargetRole": {
+    "Type": "AWS::IAM::Role",
+    "Properties": {
+      "AssumeRolePolicyDocument": {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Principal": {
+              "Service": ["events.amazonaws.com"]
+            },
+            "Action": ["sts:AssumeRole"]
+          }
+        ]
+      },
+      "Policies": [
+        {
+          "PolicyName": "AllowAPIdestinationAccess",
+          "PolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Action": "events:InvokeApiDestination",
+                "Resource": { "Fn::GetAtt": ["AlarmApiDestination", "Arn"] }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "AlarmEventRule": {
+    "Type": "AWS::Events::Rule",
+    "Properties": {
+      "Description": "EventRule",
+      "State": "ENABLED",
+      "EventBusName": "default",
+      "EventPattern": {
+        "source": ["aws.cloudwatch"],
+        "detail-type": ["CloudWatch Alarm State Change"],
+        "detail": {
+          "state": {
+            "value": ["ALARM"]
+          }
+        },
+        "resources": [
+          {
+            "prefix": {
+              "Fn::Sub": "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${AWS::StackName}-"
+            }
+          }
+        ]
+      },
+      "Targets": [
+        {
+          "Arn": { "Fn::GetAtt": ["AlarmApiDestination", "Arn"] },
+          "RoleArn": { "Fn::GetAtt": ["AlarmEventBridgeTargetRole", "Arn"] },
+          "Id": "APIdestination",
+          "InputTransformer": {
+            "InputPathsMap": {
+              "value": "$.detail.state.value",
+              "reason": "$.detail.state.reason",
+              "name": "$.detail.configuration.description",
+              "alarmName": "$.detail.alarmName"
+            },
+            "InputTemplate": {
+              "Fn::Sub": "{\n  \"channel\": \"#channel\",\n  \"username\": \"${AWS::StackName}\",\n  \"icon_emoji\": \":alarm:\",\n  \"blocks\": [\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*In alarm*: <name>\"\n      },\n      \"accessory\": {\n        \"type\": \"button\",\n        \"text\": {\n          \"type\": \"plain_text\",\n          \"text\": \"Open in console\",\n          \"emoji\": true\n        },\n        \"value\": \"click_me_123\",\n        \"url\": \"https://${AWS::Region}.console.aws.amazon.com/cloudwatch/home?region=${AWS::Region}#alarmsV2:alarm/<alarmName>\",\n        \"action_id\": \"button-action\"\n      }\n    }\n  ]\n}\n"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "AlarmOkEventRule": {
+    "Type": "AWS::Events::Rule",
+    "Properties": {
+      "Description": "EventRule",
+      "State": "ENABLED",
+      "EventBusName": "default",
+      "EventPattern": {
+        "source": ["aws.cloudwatch"],
+        "detail-type": ["CloudWatch Alarm State Change"],
+        "detail": {
+          "state": {
+            "value": ["OK"]
+          },
+          "previousState": {
+            "value": ["ALARM"]
+          }
+        },
+        "resources": [
+          {
+            "prefix": {
+              "Fn::Sub": "arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${AWS::StackName}-"
+            }
+          }
+        ]
+      },
+      "Targets": [
+        {
+          "Arn": { "Fn::GetAtt": ["AlarmApiDestination", "Arn"] },
+          "RoleArn": { "Fn::GetAtt": ["AlarmEventBridgeTargetRole", "Arn"] },
+          "Id": "APIdestination",
+          "InputTransformer": {
+            "InputPathsMap": {
+              "value": "$.detail.state.value",
+              "name": "$.detail.configuration.description"
+            },
+            "InputTemplate": {
+              "Fn::Sub": "{\n  \"channel\": \"#channel\",\n  \"text\": \"*Recovered: <name>\",\n  \"username\": \"${AWS::StackName}\",\n  \"icon_emoji\": \":white_check_mark:\"\n}\n"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
