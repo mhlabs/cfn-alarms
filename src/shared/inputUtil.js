@@ -1,8 +1,4 @@
 const inquirer = require("inquirer");
-inquirer.registerPrompt(
-  "autocomplete",
-  require("inquirer-autocomplete-prompt")
-);
 
 async function choices(message, items, type, defaults, pageSize = 5) {
   return (
@@ -38,9 +34,6 @@ async function text(message, defaultValue) {
     })
   ).text;
 }
-async function autocomplete(message, items) {
-  return await choices(message, items, "autocomplete", null, 7);
-}
 
 async function list(message, items) {
   return await choices(message, items, "list", null, 15);
@@ -66,7 +59,6 @@ async function prompt(message) {
 }
 
 module.exports = {
-  autocomplete,
   list,
   checkbox,
   text,
