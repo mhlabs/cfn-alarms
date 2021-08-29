@@ -16,15 +16,15 @@ cfn-alarms -t <template.yaml>
 
 The tool will list the resource types that it has alarm templates for. It currently supports the following types, with more to follow:
 * `AWS::Lambda::Function` / `AWS::Serverless::Function`
-* * Error rate and error count
+  * Error rate and error count
 * `AWS::DynamoDB::Table` / `AWS::Serverless::SimpleTable`
-* * User and system errors count
+  * User and system errors count
 * `AWS::ApiGateway::RestApi` / `AWS::Serverless::Api`
-* * Apdex score, HTTP error rate and error count
+  * Apdex score, HTTP error rate and error count
 * `AWS::StepFunctions::StateMachine` / `AWS::Serverless::StateMachine`
-* * Success rate < 99%
+  * Success rate < 99%
 * `AWS::SQS::Queue`
-* * Queue depth
+  * Queue depth
 
 ```
 ? Select resource types (Press <space> to select, <a> to toggle all, <i> to invert selection)
