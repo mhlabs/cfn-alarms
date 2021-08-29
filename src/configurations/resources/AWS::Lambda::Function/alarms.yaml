@@ -1,0 +1,68 @@
+ErrorsGreaterThanZero:
+  Metadata:
+    AlarmConfig:
+      Type: SumOfMetrics
+      Iterator: $.Properties.Metrics
+      MetricTemplate:
+        MetricStat:
+          Metric:
+            Dimensions:
+              - Name: FunctionName
+                Value: 
+                  Ref: ResourceNameIterator
+            MetricName: Errors
+            Namespace: AWS/Lambda
+          Period: 300
+          Stat: Sum
+        ReturnData: false
+  Type: AWS::CloudWatch::Alarm
+  Properties:
+    AlarmDescription: Lambda Errors > 0
+    ComparisonOperator: GreaterThanThreshold
+    DatapointsToAlarm: 1
+    EvaluationPeriods: 6
+    Metrics: []
+    Threshold: 0
+    TreatMissingData: notBreaching
+ErrorRate:
+  Metadata:
+    AlarmConfig:
+      Type: SimpleSum
+      Name: ErrorRate
+      Path: $.Properties.Metrics
+      MetricTemplate:
+        - Id: errors
+          MetricStat:
+            Metric:
+              Dimensions:
+                - Name: FunctionName
+                  Value: 
+                    Ref: ResourceNameIterator
+              MetricName: Errors
+              Namespace: AWS/Lambda
+            Period: 300
+            Stat: Sum
+          ReturnData: false
+        - Id: invocations
+          MetricStat:          
+            Metric:
+              Dimensions:
+                - Name: FunctionName
+                  Value: 
+                    Ref: ResourceNameIterator
+              MetricName: Invocations
+              Namespace: AWS/Lambda
+            Period: 300
+            Stat: Sum
+          ReturnData: false
+        - Id: expression
+          Expression: (errors / invocations) * 100
+  Type: AWS::CloudWatch::Alarm
+  Properties:
+    AlarmDescription: Lambda Error Rate > 1% for ResourceNameIterator
+    ComparisonOperator: GreaterThanThreshold
+    DatapointsToAlarm: 1
+    EvaluationPeriods: 6
+    Metrics: []
+    Threshold: 1
+    TreatMissingData: notBreaching

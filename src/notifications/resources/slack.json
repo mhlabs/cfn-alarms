@@ -11,7 +11,7 @@
               " ",
               [
                 "Bearer",
-                "{{resolve:secretsmanager:env-slack/Token:SecretString:Value}}"
+                "{{resolve:secretsmanager:cfn-alarms-cli/slack-token:SecretString:Value}}"
               ]
             ]
           }
