@@ -1,0 +1,60 @@
+LambdaFunctionsAlarm:
+  Type: AWS::CloudWatch::Alarm
+  Properties:
+    AlarmDescription: Lambda Errors > 0
+    ComparisonOperator: GreaterThanThreshold
+    DatapointsToAlarm: 1
+    EvaluationPeriods: 6
+    Metrics:
+      - MetricStat:
+          Metric:
+            Dimensions:
+              - Name: FunctionName
+                Value:
+                  Ref: GetItem
+            MetricName: Errors
+            Namespace: AWS/Lambda
+          Period: 300
+          Stat: Sum
+        ReturnData: false
+        Id: getitem
+      - Id: expression
+        Expression: getitem
+    Threshold: 0
+    TreatMissingData: notBreaching
+GetItemErrorRate:
+  Type: AWS::CloudWatch::Alarm
+  Properties:
+    AlarmDescription: Lambda Error Rate > 1% for GetItem
+    ComparisonOperator: GreaterThanThreshold
+    DatapointsToAlarm: 1
+    EvaluationPeriods: 6
+    Metrics:
+      - Id: errors
+        MetricStat:
+          Metric:
+            Dimensions:
+              - Name: FunctionName
+                Value:
+                  Ref: GetItem
+            MetricName: Errors
+            Namespace: AWS/Lambda
+          Period: 300
+          Stat: Sum
+        ReturnData: false
+      - Id: invocations
+        MetricStat:
+          Metric:
+            Dimensions:
+              - Name: FunctionName
+                Value:
+                  Ref: GetItem
+            MetricName: Invocations
+            Namespace: AWS/Lambda
+          Period: 300
+          Stat: Sum
+        ReturnData: false
+      - Id: expression
+        Expression: (errors / invocations) * 100
+    Threshold: 1
+    TreatMissingData: notBreaching

@@ -2,6 +2,7 @@ ErrorsGreaterThanZero:
   Metadata:
     AlarmConfig:
       Type: SumOfMetrics
+      Name: ErrorsGreaterThanZero
       Iterator: $.Properties.Metrics
       MetricTemplate:
         MetricStat:
@@ -27,7 +28,7 @@ ErrorsGreaterThanZero:
 ErrorRate:
   Metadata:
     AlarmConfig:
-      Type: SimpleSum
+      Type: ListExpression
       Name: ErrorRate
       Path: $.Properties.Metrics
       MetricTemplate:

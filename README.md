@@ -16,9 +16,15 @@ cfn-alarms -t <template.yaml>
 
 The tool will list the resource types that it has alarm templates for. It currently supports the following types, with more to follow:
 * `AWS::Lambda::Function` / `AWS::Serverless::Function`
+* * Error rate and error count
 * `AWS::DynamoDB::Table` / `AWS::Serverless::SimpleTable`
+* * User and system errors count
 * `AWS::ApiGateway::RestApi` / `AWS::Serverless::Api`
+* * Apdex score, HTTP error rate and error count
+* `AWS::StepFunctions::StateMachine` / `AWS::Serverless::StateMachine`
+* * Success rate < 99%
 * `AWS::SQS::Queue`
+* * Queue depth
 
 ```
 ? Select resource types (Press <space> to select, <a> to toggle all, <i> to invert selection)
@@ -58,3 +64,17 @@ Selecting Slack will generate resources and permissions for EventBridge API Dest
 Example output:
 
 ![slack](./images/slack.png)
+
+### 4. Select the desired output format.
+```
+? Select output (Use arrow keys)
+❯ Write to separate file (monitoring.yaml) 
+  Append to template.yaml 
+  Create CDK construct (experimental) 
+```
+
+Selecting 'Write to separate file' will write the generated alarms to a file called `monitoring.yaml` in the current directory which will be included in the main template via `Fn::Transform`
+
+Selecting 'Append to template.yaml' will append the generated alarms to the main template.
+
+Selecting 'Create CDK construct' will create a CDK construct of the alarms. This is experimental and you are likely to have to modify the code to make it work.

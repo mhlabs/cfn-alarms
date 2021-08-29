@@ -1,0 +1,37 @@
+MyTableTotalErrors:
+  Type: AWS::CloudWatch::Alarm
+  Properties:
+    AlarmDescription:
+      Fn::Sub: DynamoDB Errors > 0 for MyTable
+    ComparisonOperator: GreaterThanThreshold
+    DatapointsToAlarm: 1
+    EvaluationPeriods: 6
+    Metrics:
+      - Id: usererrors
+        MetricStat:
+          Metric:
+            Dimensions:
+              - Name: TableName
+                Value:
+                  Ref: MyTable
+            MetricName: UserErrors
+            Namespace: AWS/DynamoDB
+          Period: 300
+          Stat: Sum
+        ReturnData: false
+      - Id: systemerrors
+        MetricStat:
+          Metric:
+            Dimensions:
+              - Name: TableName
+                Value:
+                  Ref: MyTable
+            MetricName: SystemErrors
+            Namespace: AWS/DynamoDB
+          Period: 300
+          Stat: Sum
+        ReturnData: false
+      - Id: s1
+        Expression: systemerrors+usererrors
+    Threshold: 0
+    TreatMissingData: notBreaching

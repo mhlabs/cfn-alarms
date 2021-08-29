@@ -8,8 +8,7 @@ const cdkDasm = require("cdk-dasm");
 async function run(cmd) {
   const templateStr = fs.readFileSync(cmd.template, "utf8");
   let template = parser.parse("template", templateStr);
-  const samGeneratedResources = getSamGeneratedResources(template);
-  template.Resources = _.merge(template.Resources, samGeneratedResources);
+  parser.createPseudoSAMResources(template);
   const resourceTypes = _.uniq(
     Object.keys(template.Resources)
       .filter(
@@ -183,26 +182,6 @@ function saveToFile(
   };
 
   fs.writeFileSync("template.yaml", parser.stringify("template", template));
-}
-
-function getSamGeneratedResources(template) {
-  const resources = {};
-  for (const resourceEvents of Object.keys(template.Resources)
-    .filter((p) => template.Resources[p].Type === "AWS::Serverless::Function")
-    .map((q) =>
-      Object.keys(template.Resources[q].Properties.Events).map((r) => {
-        return {
-          Name: q,
-          Type: template.Resources[q].Properties.Events[r].Type,
-        };
-      })
-    )) {
-    for (const event of resourceEvents)
-      if (event.Type === "Api") {
-        resources["ServerlessRestApi"] = { Type: "AWS::ApiGateway::RestApi" };
-      }
-  }
-  return resources;
 }
 
 module.exports = {

@@ -1,7 +1,7 @@
 QueueDepthAlarm:
   Metadata:
     AlarmConfig:
-      Type: SimpleSum
+      Type: ListExpression
       Name: QueueDepth
       Path: $.Properties.Metrics
       MetricTemplate:

@@ -1,0 +1,42 @@
+FailedExecutionsRate:
+  Metadata:
+    AlarmConfig:
+      Type: ListExpression
+      Name: FailedExecutionsRate
+      Path: $.Properties.Metrics
+      MetricTemplate:
+        - Id: succeeded
+          MetricStat:
+            Metric:
+              Dimensions:
+                - Name: StateMachineArn
+                  Value: 
+                    Ref: ResourceNameIterator
+              MetricName: ExecutionsSucceeded
+              Namespace: AWS/States
+            Period: 300
+            Stat: Sum
+          ReturnData: false
+        - Id: started
+          MetricStat:
+            Metric:
+              Dimensions:
+                - Name: StateMachineArn
+                  Value: 
+                    Ref: ResourceNameIterator
+              MetricName: ExecutionsStarted
+              Namespace: AWS/States
+            Period: 300
+            Stat: Sum
+          ReturnData: false
+        - Id: expression
+          Expression: (succeeded / started) * 100
+  Type: AWS::CloudWatch::Alarm
+  Properties:
+    AlarmDescription: StateMachine success rate < 99% for ResourceNameIterator
+    ComparisonOperator: LessThanThreshold
+    DatapointsToAlarm: 1
+    EvaluationPeriods: 6
+    Metrics: []
+    Threshold: 1
+    TreatMissingData: notBreaching

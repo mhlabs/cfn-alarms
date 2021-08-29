@@ -1,0 +1,36 @@
+StateMachineFailedExecutionsRate:
+  Type: AWS::CloudWatch::Alarm
+  Properties:
+    AlarmDescription: StateMachine success rate < 99% for StateMachine
+    ComparisonOperator: LessThanThreshold
+    DatapointsToAlarm: 1
+    EvaluationPeriods: 6
+    Metrics:
+      - Id: succeeded
+        MetricStat:
+          Metric:
+            Dimensions:
+              - Name: StateMachineArn
+                Value:
+                  Ref: StateMachine
+            MetricName: ExecutionsSucceeded
+            Namespace: AWS/States
+          Period: 300
+          Stat: Sum
+        ReturnData: false
+      - Id: started
+        MetricStat:
+          Metric:
+            Dimensions:
+              - Name: StateMachineArn
+                Value:
+                  Ref: StateMachine
+            MetricName: ExecutionsStarted
+            Namespace: AWS/States
+          Period: 300
+          Stat: Sum
+        ReturnData: false
+      - Id: expression
+        Expression: (succeeded / started) * 100
+    Threshold: 1
+    TreatMissingData: notBreaching

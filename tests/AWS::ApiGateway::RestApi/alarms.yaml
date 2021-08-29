@@ -1,0 +1,101 @@
+ApiGatewayRestApisAlarm:
+  Type: AWS::CloudWatch::Alarm
+  Properties:
+    AlarmDescription: Apdex < 90 for test-api
+    ComparisonOperator: LessThanOrEqualToThreshold
+    EvaluationPeriods: 1
+    Metrics:
+      - Id: satisfied
+        MetricStat:
+          Metric:
+            Dimensions:
+              - Name: ApiName
+                Value: test-api
+            MetricName: Latency
+            Namespace: AWS/ApiGateway
+          Period: 300
+          Stat: PR(:200)
+        ReturnData: false
+      - Id: tolerated
+        MetricStat:
+          Metric:
+            Dimensions:
+              - Name: ApiName
+                Value: test-api
+            MetricName: Latency
+            Namespace: AWS/ApiGateway
+          Period: 300
+          Stat: PR(201:500)
+        ReturnData: false
+      - Id: expression
+        Expression: satisfied + (tolerated / 2)
+    Threshold: 90
+    TreatMissingData: notBreaching
+ServerlessRestApiErrorRate5XX:
+  Type: AWS::CloudWatch::Alarm
+  Properties:
+    AlarmDescription: 5XX Error Rate > 1% for ServerlessRestApi
+    ComparisonOperator: GreaterThanThreshold
+    DatapointsToAlarm: 1
+    EvaluationPeriods: 6
+    Metrics:
+      - Id: errors
+        MetricStat:
+          Metric:
+            Dimensions:
+              - Name: ApiName
+                Value: ServerlessRestApi
+            MetricName: 5XXError
+            Namespace: AWS/ApiGateway
+          Period: 300
+          Stat: Sum
+        ReturnData: false
+      - Id: requests
+        MetricStat:
+          Metric:
+            Dimensions:
+              - Name: ApiName
+                Value: ServerlessRestApi
+            MetricName: Count
+            Namespace: AWS/ApiGateway
+          Period: 300
+          Stat: Sum
+        ReturnData: false
+      - Id: expression
+        Expression: (errors / requests) * 100
+    Threshold: 1
+    TreatMissingData: notBreaching
+ServerlessRestApiErrorRate4XX:
+  Type: AWS::CloudWatch::Alarm
+  Properties:
+    AlarmDescription: 4XX Error Rate > 1% for ServerlessRestApi
+    ComparisonOperator: GreaterThanThreshold
+    DatapointsToAlarm: 1
+    EvaluationPeriods: 6
+    Metrics:
+      - Id: errors
+        MetricStat:
+          Metric:
+            Dimensions:
+              - Name: ApiName
+                Value: ServerlessRestApi
+            MetricName: 4XXError
+            Namespace: AWS/ApiGateway
+          Period: 300
+          Stat: Sum
+        ReturnData: false
+      - Id: requests
+        MetricStat:
+          Metric:
+            Dimensions:
+              - Name: ApiName
+                Value: ServerlessRestApi
+            MetricName: Count
+            Namespace: AWS/ApiGateway
+          Period: 300
+          Stat: Sum
+        ReturnData: false
+      - Id: expression
+        Expression: (errors / requests) * 100
+    Threshold: 1
+    TreatMissingData: notBreaching

@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform:
+  - AWS::Serverless-2016-10-31
+Globals:
+  Function:
+    CodeUri: ./src
+    Runtime: nodejs14.x
+    MemorySize: 128
+    Timeout: 15
+  Function_2:
+    CodeUri: ./src
+    Runtime: nodejs14.x
+    MemorySize: 128
+    Timeout: 15
+Resources:
+  StateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: !Sub ${AWS::StackName}-StateMachine
+      Policies:
+        - Version: 2012-10-17
+          Statement:
+            - Sid: Statement1
+              Effect: Allow
+              Action:
+                - lambda:InvokeFunction
+              Resource:
+                - !Sub >-
+                  arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${AWS::StackName}-*
+      Definition:
+        StartAt: Pass
+        States:
+          Pass:
+            Type: Pass
+            End: true
+  GetItem:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: GetItem.handler
+      Events:
+        GetItem:
+          Type: Api
+          Properties:
+            Method: get
+            Path: /item
+  MyTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+  MyQueue:
+    Type: AWS::SQS::Queue

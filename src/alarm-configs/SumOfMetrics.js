@@ -1,19 +1,14 @@
 const jp = require("jsonpath");
 const _ = require("lodash");
 const stringUtil = require("../shared/stringUtil");
-const samToCfMap =  {
-  "AWS::Serverless::Function": "AWS::Lambda::Function",
-  "AWS::Serverless::Api": "AWS::ApiGateway::RestApi",
-  "AWS::Serverless::SimpleTable": "AWS::DynamoDB::Table",  
-}
+const cfnUtil = require("../shared/cloudFormationUtil");
+
 function generate(alarm, template, type, alarmResources) {
   const alarmConfig = alarm.Metadata.AlarmConfig;
   const iterator = alarmConfig.Iterator;
   const node = jp.query(alarm, iterator);
   const metricTemplate = alarmConfig.MetricTemplate;
   const list = [];
-  let expressionString = "";
-  let idCounter = 0;
   for (const resourceName of Object.keys(template.Resources).filter(
     (p) => template.Resources[p].Type === type
   )) {
@@ -23,7 +18,6 @@ function generate(alarm, template, type, alarmResources) {
         resourceName
       )
     );
-    idCounter++;
     metricItem.Id = resourceName.toLowerCase();
     list.push(metricItem);
   }
@@ -34,7 +28,8 @@ function generate(alarm, template, type, alarmResources) {
   });
   jp.value(alarm, iterator, list);
   delete alarm.Metadata;
-  const cfnType = samToCfMap[type] || type;
+  const cfnType = cfnUtil.samToCfn(type);
+
   alarmResources[
     `${stringUtil.pluralise(cfnType.replace("AWS::", "").replace("::", ""))}Alarm`
   ] = alarm;

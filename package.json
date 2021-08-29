@@ -1,7 +1,7 @@
 {
   "name": "cfn-alarms-cli",
   "version": "1.0.0",
-  "description": "",
+  "description": "Tool for creating CloudFormation alarms based on the resources in a CloudFormation/SAM template",
   "main": "index.js",
   "scripts": {
     "test": "jest"

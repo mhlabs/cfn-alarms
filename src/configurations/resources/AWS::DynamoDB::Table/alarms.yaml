@@ -1,8 +1,8 @@
 DynamoDBErrorsAlarm:
   Metadata:
     AlarmConfig:
-      Type: SimpleSum
-      NameSuffix: TotalErrors
+      Type: ListExpression
+      Name: TotalErrors
       Path: $.Properties.Metrics
       MetricTemplate:
         - Id: usererrors

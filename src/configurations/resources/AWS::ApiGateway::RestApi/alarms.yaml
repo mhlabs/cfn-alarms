@@ -2,6 +2,7 @@ Apdex:
   Metadata:
     AlarmConfig:
       Type: ApdexScore
+      Name: ApdexScore
       Iterator: $.Properties.Metrics
       MetricTemplate:
         - Id: satisfied
@@ -35,4 +36,84 @@ Apdex:
     EvaluationPeriods: 1
     Metrics: []
     Threshold: 90
+    TreatMissingData: notBreaching
+ErrorRate5XX:
+  Metadata:
+    AlarmConfig:
+      Type: ListExpression
+      Name: ErrorRate5XX
+      Path: $.Properties.Metrics
+      MetricTemplate:
+        - Id: errors
+          MetricStat:
+            Metric:
+              Dimensions:
+                - Name: ApiName
+                  Value: ResourceNameIterator
+              MetricName: 5XXError
+              Namespace: AWS/ApiGateway
+            Period: 300
+            Stat: Sum
+          ReturnData: false
+        - Id: requests
+          MetricStat:          
+            Metric:
+              Dimensions:
+                - Name: ApiName
+                  Value: ResourceNameIterator
+              MetricName: Count
+              Namespace: AWS/ApiGateway
+            Period: 300
+            Stat: Sum
+          ReturnData: false
+        - Id: expression
+          Expression: (errors / requests) * 100
+  Type: AWS::CloudWatch::Alarm
+  Properties:
+    AlarmDescription: 5XX Error Rate > 1% for ResourceNameIterator
+    ComparisonOperator: GreaterThanThreshold
+    DatapointsToAlarm: 1
+    EvaluationPeriods: 6
+    Metrics: []
+    Threshold: 1
+    TreatMissingData: notBreaching
+ErrorRate4XX:
+  Metadata:
+    AlarmConfig:
+      Type: ListExpression
+      Name: ErrorRate4XX
+      Path: $.Properties.Metrics
+      MetricTemplate:
+        - Id: errors
+          MetricStat:
+            Metric:
+              Dimensions:
+                - Name: ApiName
+                  Value: ResourceNameIterator
+              MetricName: 4XXError
+              Namespace: AWS/ApiGateway
+            Period: 300
+            Stat: Sum
+          ReturnData: false
+        - Id: requests
+          MetricStat:          
+            Metric:
+              Dimensions:
+                - Name: ApiName
+                  Value: ResourceNameIterator
+              MetricName: Count
+              Namespace: AWS/ApiGateway
+            Period: 300
+            Stat: Sum
+          ReturnData: false
+        - Id: expression
+          Expression: (errors / requests) * 100
+  Type: AWS::CloudWatch::Alarm
+  Properties:
+    AlarmDescription: 4XX Error Rate > 1% for ResourceNameIterator
+    ComparisonOperator: GreaterThanThreshold
+    DatapointsToAlarm: 1
+    EvaluationPeriods: 6
+    Metrics: []
+    Threshold: 1
     TreatMissingData: notBreaching
