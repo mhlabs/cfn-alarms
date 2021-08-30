@@ -1,6 +1,6 @@
 {
   "name": "@mhlabs/cfn-alarms-cli",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Tool for creating CloudFormation alarms based on the resources in a CloudFormation/SAM template",
   "main": "index.js",
   "scripts": {
