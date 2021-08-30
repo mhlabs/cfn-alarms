@@ -3,8 +3,6 @@ const path = require("path");
 const parser = require("../../shared/parser");
 const inputUtil = require("../../shared/inputUtil");
 const _ = require("lodash");
-const slack = require("../../notifications/Slack");
-const cdkDasm = require("cdk-dasm");
 async function run(cmd) {
   const templateStr = fs.readFileSync(cmd.template, "utf8");
   let template = parser.parse("template", templateStr);
@@ -115,7 +113,6 @@ async function saveOutput(
   const options = [
     optionsConstants.SeparateFile,
     optionsConstants.AppendToTemplate,
-    optionsConstants.CDK,
   ];
 
   const output = await inputUtil.list("Select output", options);
@@ -133,24 +130,10 @@ async function saveOutput(
     case optionsConstants.AppendToTemplate:
       appendToTemplate(alarmResources, notificationResources, originalTemplate, cmd);
       break;
-    case optionsConstants.CDK:
-      await saveToCDK(alarmResources, notificationResources, originalTemplate, cmd);
-      break;
   }
 
 }
 
-async function saveToCDK(alarmResources, notificationResources, template) {
-  template.Resources = _.merge(
-    template.Resources,
-    alarmResources,
-    notificationResources
-  );  
-  console.log(template.Resources);
-  const cdkConstruct = await cdkDasm.dasmTypeScript(template);
-
-  fs.writeFileSync("CloudWatchAlarms.ts", cdkConstruct);
-}
 function appendToTemplate(alarmResources, notificationResources, template) {
   template.Resources = _.merge(
     template.Resources,

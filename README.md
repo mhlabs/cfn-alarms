@@ -1,8 +1,6 @@
 # cfn-alarms-cli
 
-Tool for creating CloudFormation alarms based on the resources in a CloudFormation/SAM/CDK* stack template.
-
-_*CDK support is pending the outstanding issues in [cdk-dasm](https://github.com/aws/aws-cdk/tree/master/packages/cdk-dasm#wip---this-module-is-still-not-fully-functional). Also read the README's reasons for not using it. However, the output may be used as a starting point for creating your own custom constructs._
+Tool for creating CloudFormation alarms based on the resources in a CloudFormation/SAM stack template.
 
 ## Why?
 This is an effort to create a baseline of CloudFormation alarms for CloudFormation stacks. The intention is to save developers' time by providing a fast way to create alarms that follow some good practices so they can focus on building features rather than managing monitors.
@@ -12,7 +10,7 @@ This is an effort to create a baseline of CloudFormation alarms for CloudFormati
 
 ## Usage:
 
-### 1. Point the tool at your CloudFormation or SAM template. If you use CDK, point it at the synthesized template of which you want to create alarms.
+### 1. Point the tool at your CloudFormation or SAM template. 
 ```
 cfn-alarms -t <template.yaml>
 ```
@@ -73,11 +71,8 @@ Example output:
 ? Select output (Use arrow keys)
 ❯ Write to separate file (monitoring.yaml) 
   Append to template.yaml 
-  Create CDK construct (experimental) 
 ```
 
 Selecting 'Write to separate file' will write the generated alarms to a file called `monitoring.yaml` in the current directory which will be included in the main template via `Fn::Transform`
 
 Selecting 'Append to template.yaml' will append the generated alarms to the main template.
-
-Selecting 'Create CDK construct' will create a CDK construct of the alarms. This is experimental and you are likely to have to modify the code to make it work.
