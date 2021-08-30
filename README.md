@@ -5,6 +5,11 @@ Tool for creating CloudFormation alarms based on the resources in a CloudFormati
 ## Why?
 This is an effort to create a baseline of CloudFormation alarms for CloudFormation stacks. The intention is to save developers' time by providing a fast way to create alarms that follow some good practices so they can focus on building features rather than managing monitors.
 
+## Installation
+```
+npm i -g @mhlabs/cfn-alarms-cli
+```
+
 ## Demo
 ![demo](./images/demo.gif)
 
